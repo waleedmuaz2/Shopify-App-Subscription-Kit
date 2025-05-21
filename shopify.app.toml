@@ -1,0 +1,56 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "YOUR_CLIENT_ID"
+name = "YOUR_PROJECT_NAME"
+handle = "YOUR_PROJECT_HANDLE"
+application_url = "https://brief-jamie-tsunami-cf.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-04"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+  [[webhooks.subscriptions]]
+  topics = [ "subscription_contracts/update" ]
+  uri = "/webhooks/subscription"
+
+  [[webhooks.subscriptions]]
+  topics = [ "subscription_contracts/create" ]
+  uri = "/webhooks/subscription"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = [ "customers/data_request" ]
+  uri = "/webhooks/customers/data-request"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = [ "customers/redact" ]
+  uri = "/webhooks/customers/redact"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = [ "shop/redact" ]
+  uri = "/webhooks/shop/redact"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products,write_own_subscription_contracts,read_orders,read_customers"
+
+[auth]
+redirect_urls = [
+  "https://brief-jamie-tsunami-cf.trycloudflare.com/auth/callback",
+  "https://brief-jamie-tsunami-cf.trycloudflare.com/auth/shopify/callback",
+  "https://brief-jamie-tsunami-cf.trycloudflare.com/api/auth/callback"
+]
+
+[pos]
+embedded = false

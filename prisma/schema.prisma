@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PENDING
+  TRIAL
+}
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PREMIUM
+  ENTERPRISE
+}
+
+enum PaymentStatus {
+  NONE
+  PENDING
+  PAID
+  FAILED
+}
+
+model Session {
+  id            String    @id
+  shop          String    @unique
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  subscription  Subscription?
+}
+
+model Subscription {
+  id            String            @id @default(cuid())
+  shop          String            @unique
+  plan          SubscriptionPlan  @default(FREE)
+  status        SubscriptionStatus @default(ACTIVE)
+  paymentStatus PaymentStatus     @default(NONE)
+  startDate     DateTime
+  endDate       DateTime?
+  trialEndsAt   DateTime?
+  price         Float
+  currency      String            @default("USD")
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  features      Json?             // Store plan features as JSON
+  metadata      Json?             // Additional subscription metadata
+  session       Session           @relation(fields: [shop], references: [shop])
+  planDetails   Plan?             @relation(fields: [plan], references: [code])
+}
+
+model Plan {
+  id          String            @id @default(cuid())
+  name        String
+  code        SubscriptionPlan  @unique
+  description String?
+  price       Float
+  currency    String            @default("USD")
+  features    Json              // Store plan features as JSON
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  subscriptions Subscription[]
+}
+
+model subscriptionHistory{
+  id          String            @id @default(cuid())
+  charge_id   String
+  shop_name   String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
